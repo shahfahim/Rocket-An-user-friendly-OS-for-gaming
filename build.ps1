@@ -12,6 +12,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $Distro = 'rocket-build'
+$MinHostFreeGB = 25
+. "$PSScriptRoot\scripts\lib\HostChecks.ps1"
 
 function Invoke-Wsl([string[]]$WslArgs) {
     # PowerShell 5.1 turns native stderr into terminating errors under 'Stop';
@@ -32,6 +34,9 @@ if (-not $installed) {
 $repo = (& wsl.exe -d $Distro -u root wslpath -a ($PSScriptRoot -replace '\\', '/')).Trim()
 Invoke-Wsl @('bash', "$repo/scripts/setup-build-host.sh")
 if ($SetupOnly) { Write-Host 'Setup complete.'; exit 0 }
+
+$distroPath = Get-WslDistroPath -Name $Distro
+if (-not (Test-HostDiskSpace -Path $distroPath -MinGB $MinHostFreeGB)) { exit 1 }
 
 $buildArgs = @('bash', "$repo/build.sh")
 if ($Clean) { $buildArgs += '--clean' }

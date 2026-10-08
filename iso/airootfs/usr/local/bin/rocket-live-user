@@ -3,5 +3,8 @@
 set -euo pipefail
 useradd -m -u 1000 -G wheel,video,audio,input -s /bin/bash rocket
 passwd -d rocket
+# cachyos-calamares owns /etc/calamares; swap in the Rocket installer config.
+rm -rf /etc/calamares
+cp -r /usr/share/rocket/calamares /etc/calamares
 install -d -o rocket -g rocket /home/rocket/Desktop
 install -m 755 -o rocket -g rocket /usr/local/share/rocket-live/install-rocket.desktop /home/rocket/Desktop/

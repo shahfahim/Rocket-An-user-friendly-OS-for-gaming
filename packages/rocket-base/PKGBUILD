@@ -1,0 +1,23 @@
+# Maintainer: Rocket OS
+pkgname=rocket-base
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Rocket OS base system defaults (branding, GRUB, snapper, zram, no indexing)"
+arch=('any')
+url="https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming"
+license=('MIT')
+depends=('filesystem' 'grub' 'snapper' 'zram-generator')
+install=rocket-base.install
+backup=('etc/systemd/zram-generator.conf' 'etc/xdg/baloofilerc')
+source=('os-release' 'rocket-os-release.hook' 'grub-rocket.cfg' 'snapper-rocket'
+        'baloofilerc' 'zram-generator.conf')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+package() {
+    install -Dm644 os-release            "$pkgdir/usr/lib/os-release-rocket"
+    install -Dm644 rocket-os-release.hook "$pkgdir/usr/share/libalpm/hooks/rocket-os-release.hook"
+    install -Dm644 grub-rocket.cfg       "$pkgdir/etc/default/grub.d/rocket.cfg"
+    install -Dm644 snapper-rocket        "$pkgdir/etc/snapper/config-templates/rocket"
+    install -Dm644 baloofilerc           "$pkgdir/etc/xdg/baloofilerc"
+    install -Dm644 zram-generator.conf   "$pkgdir/etc/systemd/zram-generator.conf"
+}

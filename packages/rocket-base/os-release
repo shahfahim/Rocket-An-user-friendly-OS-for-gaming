@@ -1,0 +1,9 @@
+NAME="Rocket OS"
+PRETTY_NAME="Rocket OS"
+ID=rocketos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;255;106;0"
+HOME_URL="https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming"
+BUG_REPORT_URL="https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming/issues"
+LOGO=rocketos

@@ -1,0 +1,15 @@
+_source_line='. /etc/default/grub.d/rocket.cfg'
+
+_hook_grub() {
+    if [ -f /etc/default/grub ] && ! grep -qxF "$_source_line" /etc/default/grub; then
+        printf '\n# Rocket OS defaults\n%s\n' "$_source_line" >> /etc/default/grub
+    fi
+}
+
+post_install() {
+    _hook_grub
+}
+
+post_upgrade() {
+    _hook_grub
+}

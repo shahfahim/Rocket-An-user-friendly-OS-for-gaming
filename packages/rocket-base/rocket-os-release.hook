@@ -1,0 +1,12 @@
+# The filesystem package owns /etc/os-release; point it back at Rocket's after every upgrade.
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = filesystem
+Target = rocket-base
+
+[Action]
+Description = Applying Rocket OS branding to /etc/os-release...
+When = PostTransaction
+Exec = /usr/bin/ln -sf /usr/lib/os-release-rocket /etc/os-release

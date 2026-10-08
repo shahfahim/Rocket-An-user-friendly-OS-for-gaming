@@ -15,7 +15,8 @@ pacman-key --init
 pacman-key --populate archlinux
 pacman -Syu --noconfirm --needed \
     archiso base-devel git rsync python python-pytest python-yaml \
-    qemu-base edk2-ovmf ntfs-3g dosfstools gptfdisk imagemagick
+    qemu-base edk2-ovmf ntfs-3g dosfstools gptfdisk imagemagick ttf-dejavu \
+    qemu-ui-gtk edk2-shell ntfsprogs mtools
 
 # CachyOS repository keys and mirrorlist (kernel + calamares come from there).
 pacman-key --recv-keys "$CACHYOS_KEY" --keyserver keyserver.ubuntu.com

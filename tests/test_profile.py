@@ -142,3 +142,28 @@ def test_installer_launcher_present():
     text = (AIROOT / "usr/local/share/rocket-live/install-rocket.desktop").read_text()
     assert "Name=Install Rocket OS" in text
     assert re.search(r"^Exec=.*calamares", text, re.M)
+
+
+def test_live_entry_logs_to_serial_for_boot_test():
+    text = (ISO / "efiboot/loader/entries/01-rocket-live.conf").read_text()
+    assert "console=ttyS0,115200" in text
+
+
+def test_live_session_activates_rocket_calamares_config():
+    # cachyos-calamares owns /etc/calamares, so our config ships elsewhere and is
+    # swapped in at live boot.
+    script = (AIROOT / "usr/local/bin/rocket-live-user").read_text()
+    assert "rm -rf /etc/calamares" in script
+    assert "cp -r /usr/share/rocket/calamares /etc/calamares" in script
+
+
+def test_build_stages_calamares_config_outside_etc():
+    build = (REPO / "build.sh").read_text()
+    assert 'iso/airootfs/usr/share/rocket/calamares' in build
+    assert 'airootfs/etc/calamares' not in build
+
+
+def test_live_initramfs_hooks_have_no_bios_or_pxe_parts():
+    hooks = bash_array((AIROOT / "etc/mkinitcpio.conf.d/archiso.conf").read_text(), "HOOKS")
+    assert "archiso" in hooks and "archiso_loop_mnt" in hooks
+    assert not [h for h in hooks if h == "memdisk" or h.startswith("archiso_pxe")]
