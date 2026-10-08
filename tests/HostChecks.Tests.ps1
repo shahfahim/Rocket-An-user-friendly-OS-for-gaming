@@ -30,3 +30,24 @@ Describe 'Get-WslDistroPath' {
         Get-WslDistroPath -Name 'rocket-build' | Should Be 'E:\WSL\rocket-build'
     }
 }
+
+Describe 'Copy-VerifiedFile' {
+    $src = Join-Path $TestDrive 'a.iso'
+    Set-Content -Path $src -Value 'rocket' -NoNewline
+    $good = (Get-FileHash $src -Algorithm SHA256).Hash.ToLower()
+
+    It 'copies the file and writes a .sha256 next to it when the hash matches' {
+        $dst = Join-Path $TestDrive 'out1'
+        New-Item -ItemType Directory $dst | Out-Null
+        Copy-VerifiedFile -Source $src -Destination $dst -ExpectedSha256 $good
+        Get-Content (Join-Path $dst 'a.iso') -Raw | Should Be 'rocket'
+        Get-Content (Join-Path $dst 'a.iso.sha256') -Raw | Should Be "$good  a.iso`n"
+    }
+
+    It 'throws and leaves no file behind when the hash does not match' {
+        $dst = Join-Path $TestDrive 'out2'
+        New-Item -ItemType Directory $dst | Out-Null
+        { Copy-VerifiedFile -Source $src -Destination $dst -ExpectedSha256 ('0' * 64) } | Should Throw 'checksum mismatch'
+        Test-Path (Join-Path $dst 'a.iso') | Should Be $false
+    }
+}

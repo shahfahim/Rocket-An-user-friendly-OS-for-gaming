@@ -25,3 +25,23 @@ function Get-WslDistroPath {
     }
     return $null
 }
+
+# Copies a file and verifies its SHA-256; writes "<hash>  <name>" to <name>.sha256.
+# Large writes from WSL to /mnt/<drive> can fail with ENOMEM, so the ISO is
+# copied from the Windows side instead.
+function Copy-VerifiedFile {
+    param(
+        [Parameter(Mandatory)][string]$Source,
+        [Parameter(Mandatory)][string]$Destination,
+        [Parameter(Mandatory)][string]$ExpectedSha256
+    )
+    $name = Split-Path $Source -Leaf
+    $target = Join-Path $Destination $name
+    Copy-Item -LiteralPath $Source -Destination $target -Force
+    $actual = (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLower()
+    if ($actual -ne $ExpectedSha256.ToLower()) {
+        Remove-Item -LiteralPath $target -Force
+        throw "checksum mismatch for ${name}: expected $ExpectedSha256, got $actual"
+    }
+    [IO.File]::WriteAllText("$target.sha256", "$actual  $name`n")
+}

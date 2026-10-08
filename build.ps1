@@ -41,3 +41,14 @@ if (-not (Test-HostDiskSpace -Path $distroPath -MinGB $MinHostFreeGB)) { exit 1 
 $buildArgs = @('bash', "$repo/build.sh")
 if ($Clean) { $buildArgs += '--clean' }
 Invoke-Wsl $buildArgs
+
+# Copy the ISO out from the Windows side and verify it against the in-WSL checksum.
+$isoOut = "\\wsl.localhost\$Distro\var\tmp\rocket-work\iso-out"
+$out = Join-Path $PSScriptRoot 'out'
+New-Item -ItemType Directory -Force $out | Out-Null
+foreach ($line in Get-Content (Join-Path $isoOut 'SHA256SUMS')) {
+    $hash, $name = $line -split '\s+', 2
+    Write-Host "Copying $name to $out ..."
+    Copy-VerifiedFile -Source (Join-Path $isoOut $name.TrimStart('*')) -Destination $out -ExpectedSha256 $hash
+    Write-Host "Done: $out\$($name.TrimStart('*'))"
+}

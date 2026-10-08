@@ -37,7 +37,8 @@ mount "${dev}p1" "$mnt"
 install -D -m644 "$shell_efi" "$mnt/EFI/Microsoft/Boot/bootmgfw.efi"
 umount "$mnt"
 
-mkfs.ntfs -f -q -L Windows "${dev}p3"
+start=$(cat "/sys/class/block/$(basename "${dev}p3")/start")
+mkfs.ntfs -f -q -L Windows -p "$start" -H 255 -S 63 "${dev}p3"
 mount -t ntfs3 "${dev}p3" "$mnt" 2>/dev/null || ntfs-3g "${dev}p3" "$mnt"
 dd if=/dev/urandom of="$mnt/filler.bin" bs=1M count="$filler_mb" status=none
 umount "$mnt"

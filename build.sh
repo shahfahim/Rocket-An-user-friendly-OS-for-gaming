@@ -7,7 +7,6 @@ REPO=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROCKET_WORK=/var/tmp/rocket-work
 SRC=$ROCKET_WORK/src          # staged copy of the repo (ext4, real symlinks)
 REPO_DIR=$ROCKET_WORK/repo    # local [rocket] pacman repo, see iso/pacman.conf
-OUT=$REPO/out
 MIN_FREE_GB=20
 CACHYOS_DB_URL=https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos.db
 
@@ -70,14 +69,11 @@ build_packages() {
 
 build_iso() {
     echo "==> Building ISO"
-    mkdir -p "$OUT"
-    rm -rf "$ROCKET_WORK/work"
+    rm -rf "$ROCKET_WORK/work" "$ROCKET_WORK/iso-out"
     mkarchiso -v -w "$ROCKET_WORK/work" -o "$ROCKET_WORK/iso-out" "$SRC/iso"
-    local iso
-    iso=$(ls -t "$ROCKET_WORK"/iso-out/RocketOS-*.iso | head -n1)
-    mv -f "$iso" "$OUT/"
-    (cd "$OUT" && sha256sum "$(basename "$iso")" > "$(basename "$iso").sha256")
-    echo "==> Done: $OUT/$(basename "$iso")"
+    # build.ps1 copies the ISO to out/ from the Windows side (large /mnt writes can fail).
+    (cd "$ROCKET_WORK/iso-out" && sha256sum RocketOS-*.iso > SHA256SUMS)
+    echo "==> Done: $(ls "$ROCKET_WORK"/iso-out/RocketOS-*.iso)"
 }
 
 stage_source
