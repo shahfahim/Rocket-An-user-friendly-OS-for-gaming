@@ -1,0 +1,32 @@
+#!/bin/bash
+# Runs inside the target after Calamares' bootloader module (shellprocess@rocket-grub).
+set -euo pipefail
+
+# Name the grub-btrfs submenu (config file belongs to grub-btrfs; edit in place).
+sed -i -E 's|^#?GRUB_BTRFS_SUBMENUNAME=.*|GRUB_BTRFS_SUBMENUNAME="Rocket snapshots"|' \
+    /etc/default/grub-btrfs/config
+grep -q '^GRUB_BTRFS_SUBMENUNAME=' /etc/default/grub-btrfs/config \
+    || echo 'GRUB_BTRFS_SUBMENUNAME="Rocket snapshots"' >> /etc/default/grub-btrfs/config
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# os-prober sometimes can't see Windows from inside the installer chroot.
+# If it missed it, add our own chainload entry for the Windows boot manager.
+if [ -f /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi ] \
+    && ! grep -q 'Windows Boot Manager' /boot/grub/grub.cfg; then
+    uuid=$(findmnt -no UUID /boot/efi)
+    cat > /etc/grub.d/40_custom <<GRUB
+#!/bin/sh
+exec tail -n +3 \$0
+menuentry "Windows Boot Manager (fallback)" --class windows --class os {
+    insmod part_gpt
+    insmod fat
+    search --no-floppy --fs-uuid --set=root $uuid
+    chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+}
+GRUB
+    chmod 755 /etc/grub.d/40_custom
+    grub-mkconfig -o /boot/grub/grub.cfg
+fi
+
+rm -f /usr/local/bin/rocket-grub-setup
