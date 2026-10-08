@@ -1,0 +1,8 @@
+# Symlinks created inside iso/airootfs by build.sh before mkarchiso.
+# Windows git checkouts can't hold symlinks, so they live here instead.
+# Format: <path relative to airootfs> -> <target>
+etc/localtime -> /usr/share/zoneinfo/UTC
+etc/systemd/system/dbus-org.freedesktop.timesync1.service -> /usr/lib/systemd/system/systemd-timesyncd.service
+etc/systemd/system/multi-user.target.wants/pacman-init.service -> ../pacman-init.service
+etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service -> /usr/lib/systemd/system/systemd-timesyncd.service
+etc/systemd/system-generators/systemd-gpt-auto-generator -> /dev/null
