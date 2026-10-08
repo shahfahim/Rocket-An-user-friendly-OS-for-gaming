@@ -1,4 +1,6 @@
 # --- Base system ---
+cachyos-keyring
+cachyos-mirrorlist
 base
 linux-cachyos
 linux-cachyos-headers

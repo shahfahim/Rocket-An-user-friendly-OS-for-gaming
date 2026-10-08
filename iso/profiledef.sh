@@ -15,4 +15,6 @@ file_permissions=(
   ["/etc/shadow"]="0:0:400"
   ["/etc/sudoers.d/rocket-live"]="0:0:440"
   ["/usr/local/bin/rocket-live-user"]="0:0:755"
+  ["/usr/local/bin/rocket-post-install"]="0:0:755"
+  ["/usr/local/bin/rocket-grub-setup"]="0:0:755"
 )

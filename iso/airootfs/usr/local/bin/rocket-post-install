@@ -1,0 +1,45 @@
+#!/bin/bash
+# Runs inside the freshly unpacked target (Calamares shellprocess@rocket-post).
+# Turns the copied live image into a normal installed system.
+set -euo pipefail
+
+echo "Removing live-session files..."
+rm -f /etc/sudoers.d/rocket-live /etc/sddm.conf.d/autologin.conf
+rm -f /etc/systemd/system/rocket-live-user.service \
+      /etc/systemd/system/multi-user.target.wants/rocket-live-user.service \
+      /usr/local/bin/rocket-live-user
+rm -rf /usr/local/share/rocket-live
+rm -f /etc/systemd/system/pacman-init.service \
+      /etc/systemd/system/multi-user.target.wants/pacman-init.service \
+      /etc/systemd/system/etc-pacman.d-gnupg.mount
+rm -f /etc/systemd/journald.conf.d/volatile-storage.conf
+rm -f /etc/systemd/system-generators/systemd-gpt-auto-generator
+# archiso initramfs hooks must not end up in the installed initramfs (initcpio runs after us).
+rm -f /etc/mkinitcpio.conf.d/archiso.conf
+rm -rf /etc/calamares /usr/share/rocket/calamares
+
+echo "Initialising pacman keyring..."
+# The live keyring lived on a tmpfs, so the target has none.
+pacman-key --init
+pacman-key --populate
+
+echo "Removing installer packages..."
+pacman -Rns --noconfirm "$(pacman -Qqo /usr/bin/calamares)" mkinitcpio-archiso
+
+echo "Configuring snapper..."
+# @snapshots is already mounted on /.snapshots; snapper wants to create it itself.
+if mountpoint -q /.snapshots; then
+    dev=$(findmnt -no SOURCE /.snapshots | sed 's/\[.*//')
+    umount /.snapshots
+    rmdir /.snapshots
+    snapper --no-dbus -c root create-config -t rocket /
+    btrfs subvolume delete /.snapshots
+    mkdir /.snapshots
+    mount -o subvol=@snapshots "$dev" /.snapshots
+    chmod 750 /.snapshots
+else
+    snapper --no-dbus -c root create-config -t rocket /
+fi
+
+rm -f /usr/local/bin/rocket-post-install
+echo "Rocket OS post-install done."
