@@ -1,0 +1,37 @@
+---
+componentName: rocket
+
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 900px,620px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+
+strings:
+    productName:         Rocket OS
+    shortProductName:    Rocket
+    version:             rolling
+    shortVersion:        rolling
+    versionedName:       Rocket OS
+    shortVersionedName:  Rocket
+    bootloaderEntryName: RocketOS
+    productUrl:          https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming
+    supportUrl:          https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming/issues
+    knownIssuesUrl:      https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming/issues
+    releaseNotesUrl:     https://github.com/shahfahim/Rocket-An-user-friendly-OS-for-gaming
+
+images:
+    productLogo:    logo.png
+    productIcon:    logo.png
+    productWelcome: welcome.png
+
+slideshow: show.qml
+slideshowAPI: 2
+
+style:
+   SidebarBackground:         "#121418"
+   SidebarText:               "#FFFFFF"
+   SidebarTextCurrent:        "#FF6A00"
+   SidebarBackgroundCurrent:  "#1E2128"
