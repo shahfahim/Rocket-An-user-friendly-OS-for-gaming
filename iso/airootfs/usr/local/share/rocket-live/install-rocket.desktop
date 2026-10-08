@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Install Rocket OS
+Comment=Install Rocket OS alongside Windows
+Icon=calamares
+Exec=sudo -E calamares
+Terminal=false
+Categories=System;

@@ -1,0 +1,11 @@
+[Unit]
+Description=Create the Rocket OS live user
+Before=display-manager.service systemd-user-sessions.service
+ConditionPathExists=!/home/rocket
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rocket-live-user
+
+[Install]
+WantedBy=multi-user.target

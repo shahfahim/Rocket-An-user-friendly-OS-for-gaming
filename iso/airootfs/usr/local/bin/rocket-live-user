@@ -1,0 +1,7 @@
+#!/bin/bash
+# Live session only: create the passwordless 'rocket' user with the installer on its desktop.
+set -euo pipefail
+useradd -m -u 1000 -G wheel,video,audio,input -s /bin/bash rocket
+passwd -d rocket
+install -d -o rocket -g rocket /home/rocket/Desktop
+install -m 755 -o rocket -g rocket /usr/local/share/rocket-live/install-rocket.desktop /home/rocket/Desktop/

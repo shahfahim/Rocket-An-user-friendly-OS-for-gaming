@@ -6,3 +6,10 @@ etc/systemd/system/dbus-org.freedesktop.timesync1.service -> /usr/lib/systemd/sy
 etc/systemd/system/multi-user.target.wants/pacman-init.service -> ../pacman-init.service
 etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service -> /usr/lib/systemd/system/systemd-timesyncd.service
 etc/systemd/system-generators/systemd-gpt-auto-generator -> /dev/null
+etc/systemd/system/default.target -> /usr/lib/systemd/system/graphical.target
+etc/systemd/system/display-manager.service -> /usr/lib/systemd/system/sddm.service
+etc/systemd/system/multi-user.target.wants/NetworkManager.service -> /usr/lib/systemd/system/NetworkManager.service
+etc/systemd/system/dbus-org.freedesktop.nm-dispatcher.service -> /usr/lib/systemd/system/NetworkManager-dispatcher.service
+etc/systemd/system/bluetooth.target.wants/bluetooth.service -> /usr/lib/systemd/system/bluetooth.service
+etc/systemd/system/dbus-org.bluez.service -> /usr/lib/systemd/system/bluetooth.service
+etc/systemd/system/multi-user.target.wants/rocket-live-user.service -> ../rocket-live-user.service

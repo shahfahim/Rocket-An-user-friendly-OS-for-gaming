@@ -94,3 +94,51 @@ def test_packages_resolve(tmp_path):
     )
     unresolved = re.findall(r"target not found: (\S+)", r.stderr)
     assert r.returncode == 0, f"unresolved packages: {unresolved or r.stderr[-500:]}"
+
+
+# --- Task 3: live session overlay ---
+AIROOT = ISO / "airootfs"
+
+
+def symlinks():
+    links = {}
+    for line in (ISO / "symlinks.txt").read_text().splitlines():
+        if line.strip() and not line.startswith("#"):
+            link, target = (s.strip() for s in line.split("->"))
+            links[link] = target
+    return links
+
+
+def test_live_autologin_plasma():
+    text = (AIROOT / "etc/sddm.conf.d/autologin.conf").read_text()
+    assert re.search(r"^User=rocket$", text, re.M)
+    assert re.search(r"^Session=plasma$", text, re.M)
+
+
+def test_display_manager_is_sddm():
+    assert symlinks()["etc/systemd/system/display-manager.service"].endswith("/sddm.service")
+
+
+def test_networkmanager_enabled():
+    assert "etc/systemd/system/multi-user.target.wants/NetworkManager.service" in symlinks()
+
+
+def test_live_user_created_before_login():
+    unit = (AIROOT / "etc/systemd/system/rocket-live-user.service").read_text()
+    assert "Before=display-manager.service" in unit
+    assert "etc/systemd/system/multi-user.target.wants/rocket-live-user.service" in symlinks()
+    script = (AIROOT / "usr/local/bin/rocket-live-user").read_text()
+    assert re.search(r"useradd -m .*-G wheel.* rocket", script)
+
+
+def test_sudoers_permissions():
+    perms = (ISO / "profiledef.sh").read_text()
+    assert '["/etc/sudoers.d/rocket-live"]="0:0:440"' in perms
+    assert '["/usr/local/bin/rocket-live-user"]="0:0:755"' in perms
+    assert "rocket ALL=(ALL) NOPASSWD: ALL" in (AIROOT / "etc/sudoers.d/rocket-live").read_text()
+
+
+def test_installer_launcher_present():
+    text = (AIROOT / "usr/local/share/rocket-live/install-rocket.desktop").read_text()
+    assert "Name=Install Rocket OS" in text
+    assert re.search(r"^Exec=.*calamares", text, re.M)
